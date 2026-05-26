@@ -1,3 +1,19 @@
-<h2>hfdjg</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% for data in get_datas %}
+    <h2>{{data.product_name}}</h2>
+    <p>{{data.product_desc}}</p>
+    <h1>{{data.product_price}}</h1>
+    {% endfor %}
 
-<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUOUf1sYsNgoGsyfCi-fes4ujzMTSpGg0ROQ&s" alt="">
+
+
+    
+</body>
+</html>
