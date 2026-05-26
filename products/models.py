@@ -7,4 +7,7 @@ class Add_Products(models.Model):
     product_desc = models.TextField(max_length=100)
     product_price = models.IntegerField()
 
+    def __str__(self):
+        return self.product_name
+
 
