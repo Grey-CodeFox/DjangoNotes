@@ -25,9 +25,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('products/',include('products.urls')),
 
-    path('',home), 
+    path('',home,name='home_url'), 
+
     path('about/',about),
-    path('payment/',payment),
+    path('payment/',payment)
+    
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

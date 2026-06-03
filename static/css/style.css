@@ -1,5 +1,5 @@
 h3{
-    color: red;
+    color: blue;
 }
 
 img { 
@@ -15,4 +15,19 @@ color:green
 
 .batman{
     color: blue;
+}
+
+h2{
+    color: green;
+}
+
+.h4{
+    color: blue;
+}
+
+
+
+.form_div{
+    display: flex;
+    flex-direction: column;
 }

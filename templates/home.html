@@ -1,27 +1,40 @@
- {% extends 'index.html' %}
+{% extends 'index.html' %}
 {% load static %}
 
     {% block content %}
 
-    <h3>this is home page</h3>
+    <h2>This is home page</h2>
 
-    <div>
-        <h1 class="batman">The below batman image is a static one ,coz it is directly loaded from an external URL, not from Django media or database</h1>
-    <img  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjMJwSAqRjTwAqbD32c1jTQEW7vJdoEf-mNw&s" alt="">
-    <img src="https://upload.wikimedia.org/wikipedia/en/f/f2/Robert_Downey_Jr._as_Tony_Stark_in_Avengers_Infinity_War.jpg" alt="">
-    </div>
-
-<h1 class="superman">The below are dynamic datas , coz its loaded from the backend </h1>
-    {% for item in products %}
 <div>
-    <h2>{{item.product_name}}</h2>
-    <p>{{item.product_desc}}</p>
-    <h1>{{item.product_price}}</h1>
-    <img src="{{item.image.url}}" alt="">
+    <h1>fill the form to add products </h1>
+
+    
+    <form action="{% url 'home_url' %}" method="POST">
+        {% csrf_token %}
+     <div class="form_div">
+        <label for="">Name</label>
+        <input type="text" name="name" placeholder="enter product name">
+         <!-- <br> -->
+        <label for="">Description</label>
+        <input type="text" name="descrition" placeholder="enter descrition">
+         <!-- <br> -->
+        <label for="">price</label>
+        <input type="text" name="price" placeholder="enter descrition">
+        <button type="submit">Add product</button>
+        </div>
+    </form>
+
+
 </div>
 
 
+<div>
+    <h1>The below products are fetched from backend </h1>
+    {% for item in products %}
+        <h2>product Name : {{item.product_name}}</h2>
+        <p>product Description :{{item.product_desc}}</p>
     {% endfor %}
+</div>
 
- 
-{% endblock %}
+    {% endblock %}
+
