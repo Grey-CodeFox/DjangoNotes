@@ -1,6 +1,8 @@
-🎯 Django DELETE Request → Delete Data → Show Updated Data (Actual Flow)
+ഇതുപോലെ Django URL Mapping + Reverse URL + Update Function Complete Flow നോക്കാം.
 
-Todo App-il user oru task delete cheyyunnu enn karuthuka.
+🎯 Django UPDATE Request → Reverse URL → Update Data → Show Updated Data
+
+User ഒരു task edit ചെയ്യുന്നു എന്ന് കരുതുക.
 
 
 ---
@@ -11,13 +13,13 @@ Todo App-il user oru task delete cheyyunnu enn karuthuka.
 │   User   │
 └────┬─────┘
      │
-     │ 1. Click Delete Button
+     │ 1. Click Edit Button
      ▼
 ┌──────────────┐
 │  home.html   │
 └────┬─────────┘
      │
-     │ 2. Request
+     │ 2. Reverse URL
      ▼
 ┌──────────────┐
 │   urls.py    │
@@ -25,34 +27,40 @@ Todo App-il user oru task delete cheyyunnu enn karuthuka.
      │
      ▼
 ┌──────────────┐
-│   views.py   │
+│ update view  │
 └────┬─────────┘
      │
-     │ 3. Find Object
-     ▼
-┌──────────────┐
-│  models.py   │
-└────┬─────────┘
-     │
-     │ 4. delete()
+     │ 3. GET Request
      ▼
 ┌──────────────┐
 │  Database    │
 └────┬─────────┘
      │
-     │ 5. Redirect
+     │ 4. Fetch Object
      ▼
 ┌──────────────┐
-│   views.py   │
+│ update.html  │
 └────┬─────────┘
      │
-     │ 6. GET Request
+     │ 5. User Submit Form
+     ▼
+┌──────────────┐
+│ update view  │
+└────┬─────────┘
+     │
+     │ 6. Save Changes
      ▼
 ┌──────────────┐
 │  Database    │
 └────┬─────────┘
      │
-     │ 7. Fetch Remaining Data
+     │ 7. Redirect
+     ▼
+┌──────────────┐
+│  home view   │
+└────┬─────────┘
+     │
+     │ 8. Fetch New Data
      ▼
 ┌──────────────┐
 │  home.html   │
@@ -66,32 +74,34 @@ Todo App-il user oru task delete cheyyunnu enn karuthuka.
 
 ---
 
-Example Database Before Delete
+Step 1: User Clicks Edit
 
-Tasks Table
+home.html
 
-+----+-----------+
-| id | task      |
-+----+-----------+
-| 1  | Study     |
-| 2  | Gym       |
-| 3  | Shopping  |
-+----+-----------+
-
-User "Delete" click cheyyunnu task id=2 (Gym).
+<a href="{% url 'update_task' task.id %}">
+    Edit
+</a>
 
 
 ---
 
-Actual Django Request Cycle
+Reverse URL Mapping
 
-Step 1: User Clicks Delete
+{% url 'update_task' task.id %}
+           │
+           ▼
+urls.py
+           │
+           ▼
+update/5/
 
-User
- ↓
-Click Delete Button
- ↓
-/delete/2/
+Suppose:
+
+task.id = 5
+
+Generated URL:
+
+/update/5/
 
 
 ---
@@ -99,155 +109,299 @@ Click Delete Button
 Step 2: URL Routing
 
 urls.py
- ↓
-path('delete/<int:id>/', views.delete_task)
- ↓
-views.delete_task(request, 2)
+
+path(
+    'update/<int:id>/',
+    views.update_task,
+    name='update_task'
+)
+
+Flow:
+
+/update/5/
+      │
+      ▼
+urls.py
+      │
+      ▼
+views.update_task(request,id=5)
 
 
 ---
 
-Step 3: View Receives Request
+Step 3: View Receives GET Request
 
 views.py
- ↓
-Task.objects.get(id=2)
 
-Database-il ninn id=2 ulla object fetch cheyyunnu.
+def update_task(request,id):
 
-Task Object
+    task = Task.objects.get(id=id)
 
-id = 2
-task = "Gym"
-
-
----
-
-Step 4: Delete Object
-
-task.delete()
+    return render(
+        request,
+        'update.html',
+        {'task':task}
+    )
 
 
 ---
 
-Step 5: Database Operation
+Step 4: Database Fetch
+
+Database
+
++----+-----------+
+| id | task      |
++----+-----------+
+| 1  | Study     |
+| 5  | Gym       |
+| 7  | Shopping  |
++----+-----------+
+
+Query:
+
+SELECT *
+FROM task
+WHERE id = 5;
+
+Result:
+
+id = 5
+task = Gym
+
+
+---
+
+Step 5: Show Form
+
+update.html
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input
+        type="text"
+        name="task"
+        value="{{ task.name }}"
+    >
+
+    <button type="submit">
+        Update
+    </button>
+</form>
+
+Browser shows:
+
+[ Gym            ]
+
+      Update
+
+
+---
+
+Step 6: User Changes Value
+
+User changes:
+
+Gym
+
+to
+
+Daily Gym
+
+Then clicks:
+
+Update
+
+POST Request:
+
+POST /update/5/
+
+
+---
+
+Step 7: POST Reaches View
+
+def update_task(request,id):
+
+    task = Task.objects.get(id=id)
+
+    if request.method == "POST":
+
+        task.name = request.POST.get('task')
+
+        task.save()
+
+        return redirect('home')
+
+
+---
+
+Step 8: Save to Database
 
 Before:
 
 +----+-----------+
-| 1  | Study     |
-| 2  | Gym       |
-| 3  | Shopping  |
+| id | task      |
++----+-----------+
+| 5  | Gym       |
 +----+-----------+
 
-SQL internally:
+Django internally:
 
-DELETE FROM task
-WHERE id = 2;
+UPDATE task
+SET name='Daily Gym'
+WHERE id=5;
 
 After:
 
-+----+-----------+
-| 1  | Study     |
-| 3  | Shopping  |
-+----+-----------+
-
-Record permanently remove aayi.
++----+-------------+
+| id | task        |
++----+-------------+
+| 5  | Daily Gym   |
++----+-------------+
 
 
 ---
 
-Step 6: Redirect
-
-Delete kazhinjal:
+Step 9: Redirect
 
 return redirect('home')
 
 Flow:
 
-View
- ↓
+Update View
+      │
+      ▼
 Redirect
- ↓
+      │
+      ▼
 /
 
 
 ---
 
-Step 7: New GET Request
+Step 10: Home View Executes Again
 
-Browser automatic aayi:
+def home(request):
 
-GET /
- ↓
-urls.py
- ↓
-home view
+    tasks = Task.objects.all()
+
+    return render(
+        request,
+        'home.html',
+        {'tasks':tasks}
+    )
 
 
 ---
 
-Step 8: Fetch Updated Data
-
-tasks = Task.objects.all()
+Step 11: Fetch Updated Data
 
 Database:
 
-+----+-----------+
-| 1  | Study     |
-| 3  | Shopping  |
-+----+-----------+
++----+-------------+
+| id | task        |
++----+-------------+
+| 1  | Study       |
+| 5  | Daily Gym   |
+| 7  | Shopping    |
++----+-------------+
 
 
 ---
 
-Step 9: Render Template
+Step 12: Render Updated Page
 
-Context
- ↓
-home.html
- ↓
-Browser
-
-User updated list kaanunnu:
+Browser shows:
 
 Study
+
+Daily Gym
+
 Shopping
 
-"Gym" kaanilla.
+Old value:
+
+Gym
+
+disappears.
 
 
 ---
 
-Professional Django Delete Flow
+🎯 Reverse URL Mapping Internal Flow
 
-User Click Delete
-        ↓
-Request
-        ↓
+Template
+   │
+   ▼
+{% url 'update_task' task.id %}
+   │
+   ▼
 urls.py
-        ↓
-views.py
-        ↓
-Get Object By ID
-        ↓
-delete()
-        ↓
-Database Remove Record
-        ↓
-Redirect
-        ↓
-GET Request
-        ↓
-Fetch Updated Data
-        ↓
-Render Template
-        ↓
-Response
+   │
+   ▼
+path(
+ 'update/<int:id>/',
+ views.update_task,
+ name='update_task'
+)
+   │
+   ▼
+Generated URL
+
+/update/5/
 
 
 ---
 
-⚡ Interview Point
+🎯 Professional Django Update Flow
 
-Django CRUD applications-il delete operation kazhinjalum save operation pole thanne Redirect → GET → Render pattern aanu use cheyyunnath. Ithu page refresh cheythal delete operation veendum execute aakathirikkanum clean request cycle maintain cheyyanum sahayikkunnu.
+User Click Edit
+        │
+        ▼
+Reverse URL
+        │
+        ▼
+urls.py
+        │
+        ▼
+Update View (GET)
+        │
+        ▼
+Database Fetch
+        │
+        ▼
+update.html
+        │
+        ▼
+User Submit Form
+        │
+        ▼
+POST Request
+        │
+        ▼
+Update View (POST)
+        │
+        ▼
+save()
+        │
+        ▼
+Database UPDATE
+        │
+        ▼
+Redirect
+        │
+        ▼
+Home View
+        │
+        ▼
+Fetch Updated Data
+        │
+        ▼
+Render Template
+        │
+        ▼
+Browser Response
+
+ഇത് Django CRUD-ന്റെ core flow ആണ്. Create, Update, Delete, Reverse URL Mapping, Redirect, GET/POST cycle എല്ലാം ഇതേ pattern follow ചെയ്യുന്നു.
