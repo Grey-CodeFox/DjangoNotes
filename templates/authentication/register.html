@@ -1,0 +1,25 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+
+<h1>This is signup page</h1>
+
+<form  class="register-form" method="POST" action="{% url 'register' %}">
+    {% csrf_token %}
+
+    <label for="">username</label>
+    <input type="text" name="username">
+
+    <label for="">email address</label>
+    <input type="email" name="email" >
+
+    <label for="">password</label>
+    <input type="password" name="password">
+
+    <label for="">confirm password</label>
+    <input type="password" name="cpassword">
+
+    <button type="submit">signup</button>
+</form>
+
+{% endblock %}
