@@ -1,407 +1,251 @@
-ഇതുപോലെ Django URL Mapping + Reverse URL + Update Function Complete Flow നോക്കാം.
+Sheri 😄. Oru generic example edukkaam.
 
-🎯 Django UPDATE Request → Reverse URL → Update Data → Show Updated Data
+Oru Mall Membership Example
 
-User ഒരു task edit ചെയ്യുന്നു എന്ന് കരുതുക.
+Characters:
 
-
----
-
-🔄 Complete Flow
-
-┌──────────┐
-│   User   │
-└────┬─────┘
-     │
-     │ 1. Click Edit Button
-     ▼
-┌──────────────┐
-│  home.html   │
-└────┬─────────┘
-     │
-     │ 2. Reverse URL
-     ▼
-┌──────────────┐
-│   urls.py    │
-└────┬─────────┘
-     │
-     ▼
-┌──────────────┐
-│ update view  │
-└────┬─────────┘
-     │
-     │ 3. GET Request
-     ▼
-┌──────────────┐
-│  Database    │
-└────┬─────────┘
-     │
-     │ 4. Fetch Object
-     ▼
-┌──────────────┐
-│ update.html  │
-└────┬─────────┘
-     │
-     │ 5. User Submit Form
-     ▼
-┌──────────────┐
-│ update view  │
-└────┬─────────┘
-     │
-     │ 6. Save Changes
-     ▼
-┌──────────────┐
-│  Database    │
-└────┬─────────┘
-     │
-     │ 7. Redirect
-     ▼
-┌──────────────┐
-│  home view   │
-└────┬─────────┘
-     │
-     │ 8. Fetch New Data
-     ▼
-┌──────────────┐
-│  home.html   │
-└────┬─────────┘
-     │
-     ▼
-┌──────────┐
-│ Browser  │
-└──────────┘
+Rahul = User
+Browser = Rahulinte purse
+Django = Mall Security
+Database = Membership Records
+Session ID = Membership Card
 
 
 ---
 
-Step 1: User Clicks Edit
+1. Registration
 
-home.html
+Rahul mall-il membership edukunnu.
 
-<a href="{% url 'update_task' task.id %}">
-    Edit
-</a>
+Form fill cheyyunnu:
 
+Username: rahul
+Password: 1234
 
----
+Django:
 
-Reverse URL Mapping
-
-{% url 'update_task' task.id %}
-           │
-           ▼
-urls.py
-           │
-           ▼
-update/5/
-
-Suppose:
-
-task.id = 5
-
-Generated URL:
-
-/update/5/
-
-
----
-
-Step 2: URL Routing
-
-urls.py
-
-path(
-    'update/<int:id>/',
-    views.update_task,
-    name='update_task'
-)
-
-Flow:
-
-/update/5/
-      │
-      ▼
-urls.py
-      │
-      ▼
-views.update_task(request,id=5)
-
-
----
-
-Step 3: View Receives GET Request
-
-views.py
-
-def update_task(request,id):
-
-    task = Task.objects.get(id=id)
-
-    return render(
-        request,
-        'update.html',
-        {'task':task}
-    )
-
-
----
-
-Step 4: Database Fetch
-
-Database
-
-+----+-----------+
-| id | task      |
-+----+-----------+
-| 1  | Study     |
-| 5  | Gym       |
-| 7  | Shopping  |
-+----+-----------+
-
-Query:
-
-SELECT *
-FROM task
-WHERE id = 5;
-
-Result:
-
-id = 5
-task = Gym
-
-
----
-
-Step 5: Show Form
-
-update.html
-
-<form method="POST">
-    {% csrf_token %}
-
-    <input
-        type="text"
-        name="task"
-        value="{{ task.name }}"
-    >
-
-    <button type="submit">
-        Update
-    </button>
-</form>
-
-Browser shows:
-
-[ Gym            ]
-
-      Update
-
-
----
-
-Step 6: User Changes Value
-
-User changes:
-
-Gym
-
-to
-
-Daily Gym
-
-Then clicks:
-
-Update
-
-POST Request:
-
-POST /update/5/
-
-
----
-
-Step 7: POST Reaches View
-
-def update_task(request,id):
-
-    task = Task.objects.get(id=id)
-
-    if request.method == "POST":
-
-        task.name = request.POST.get('task')
-
-        task.save()
-
-        return redirect('home')
-
-
----
-
-Step 8: Save to Database
-
-Before:
-
-+----+-----------+
-| id | task      |
-+----+-----------+
-| 5  | Gym       |
-+----+-----------+
-
-Django internally:
-
-UPDATE task
-SET name='Daily Gym'
-WHERE id=5;
-
-After:
-
-+----+-------------+
-| id | task        |
-+----+-------------+
-| 5  | Daily Gym   |
-+----+-------------+
-
-
----
-
-Step 9: Redirect
-
-return redirect('home')
-
-Flow:
-
-Update View
-      │
-      ▼
-Redirect
-      │
-      ▼
-/
-
-
----
-
-Step 10: Home View Executes Again
-
-def home(request):
-
-    tasks = Task.objects.all()
-
-    return render(
-        request,
-        'home.html',
-        {'tasks':tasks}
-    )
-
-
----
-
-Step 11: Fetch Updated Data
+"Okay, ninte account create cheythu."
 
 Database:
 
-+----+-------------+
-| id | task        |
-+----+-------------+
-| 1  | Study       |
-| 5  | Daily Gym   |
-| 7  | Shopping    |
-+----+-------------+
+auth_user
+
+ID    Username
+1     rahul
+
+Ippo account undu.
+
+Pakshe login aayittilla.
 
 
 ---
 
-Step 12: Render Updated Page
+2. Login
 
-Browser shows:
+Rahul mall-il varunnu.
 
-Study
+Security:
 
-Daily Gym
+Username?
 
-Shopping
+Rahul:
 
-Old value:
+rahul
 
-Gym
+Security:
 
-disappears.
+Password?
 
+Rahul:
 
----
+1234
 
-🎯 Reverse URL Mapping Internal Flow
+Code:
 
-Template
-   │
-   ▼
-{% url 'update_task' task.id %}
-   │
-   ▼
-urls.py
-   │
-   ▼
-path(
- 'update/<int:id>/',
- views.update_task,
- name='update_task'
+user = authenticate(
+    request,
+    username='rahul',
+    password='1234'
 )
-   │
-   ▼
-Generated URL
-
-/update/5/
 
 
 ---
 
-🎯 Professional Django Update Flow
+3. authenticate() Enthanu?
 
-User Click Edit
-        │
-        ▼
-Reverse URL
-        │
-        ▼
-urls.py
-        │
-        ▼
-Update View (GET)
-        │
-        ▼
-Database Fetch
-        │
-        ▼
-update.html
-        │
-        ▼
-User Submit Form
-        │
-        ▼
-POST Request
-        │
-        ▼
-Update View (POST)
-        │
-        ▼
-save()
-        │
-        ▼
-Database UPDATE
-        │
-        ▼
-Redirect
-        │
-        ▼
-Home View
-        │
-        ▼
-Fetch Updated Data
-        │
-        ▼
-Render Template
-        │
-        ▼
-Browser Response
+Security database nokkunnu.
 
-ഇത് Django CRUD-ന്റെ core flow ആണ്. Create, Update, Delete, Reverse URL Mapping, Redirect, GET/POST cycle എല്ലാം ഇതേ pattern follow ചെയ്യുന്നു.
+Username undo?
+
+✔️ Undu
+
+Password correct ano?
+
+✔️ Correct
+
+Security:
+
+"Nee Rahul aanu ennu enikku manassilaayi."
+
+Return:
+
+<User: rahul>
+
+authenticate() identity verify cheyyunnu mathram.
+
+
+---
+
+4. login()
+
+Ippo security oru membership card kodukkunnu.
+
+CARD-987XYZ
+
+Code:
+
+login(request, user)
+
+
+---
+
+5. Session Create Aakunnu
+
+Django session table-il save cheyyum.
+
+django_session
+
+Session ID      User
+-------------------------
+CARD-987XYZ     rahul
+
+
+---
+
+6. Browser Cookie Store Cheyyunnu
+
+Browser cookie save cheyyum.
+
+sessionid=CARD-987XYZ
+
+Password save cheyyunnilla.
+
+Username save cheyyunnilla.
+
+Session ID mathram.
+
+
+---
+
+7. Home Page Open Cheyyumbo
+
+User:
+
+/home/
+
+Browser automatically:
+
+sessionid=CARD-987XYZ
+
+send cheyyum.
+
+
+---
+
+8. Django Side-il Enthanu Nadakkunnath?
+
+Django:
+
+CARD-987XYZ aarude card aanu?
+
+Session table nokkum.
+
+CARD-987XYZ -> rahul
+
+Appol:
+
+request.user
+
+becomes:
+
+<User: rahul>
+
+
+---
+
+request.user engane undaakunnu?
+
+Flow:
+
+Request vannu
+      │
+      ▼
+Cookie kitti
+      │
+      ▼
+Session ID kitti
+      │
+      ▼
+Session table nokki
+      │
+      ▼
+User kandupidichu
+      │
+      ▼
+request.user set cheythu
+
+
+---
+
+login_required
+
+@login_required
+def profile(request):
+    ...
+
+Django check cheyyum:
+
+Valid session undo?
+
+Yes
+
+Allow access
+
+No
+
+Redirect to /login/
+
+
+---
+
+Logout
+
+logout(request)
+
+Django:
+
+Session delete
+Cookie delete
+
+
+---
+
+Pinne user /profile/ open cheythaal:
+
+Valid session illa
+
+Athukond:
+
+Redirect -> /login/
+
+Oru sentence-il:
+
+authenticate() → "Nee aaranennu verify cheyyunnu."
+
+login() → "Ninakku session card tharunnu."
+
+sessionid → "Membership card number."
+
+request.user → "Aa card vechu Django kandupidicha current user."
+
+logout() → "Card cancel cheyyunnu."
